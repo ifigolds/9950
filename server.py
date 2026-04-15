@@ -125,8 +125,8 @@ async def download_backup(password: str):
     content = json.dumps(data, ensure_ascii=False, indent=2)
 
     return Response(
-        content=content,
-        media_type="application/json",
+        content=content.encode("utf-8"),
+        media_type="application/json; charset=utf-8",
         headers={
             "Content-Disposition": 'attachment; filename="warehouse_backup.json"'
         }
