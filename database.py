@@ -1,10 +1,11 @@
 import sqlite3
+import json
 
 DB_NAME = "warehouse.db"
 
 
 def get_connection():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_NAME, timeout=10)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -12,6 +13,8 @@ def get_connection():
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
+
+    cursor.execute("PRAGMA journal_mode=WAL;")
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS inventory (
@@ -73,6 +76,7 @@ def seed_data():
 
     if seeded:
         add_log("נוצרו נתוני התחלה")
+
 
 def get_all_inventory():
     conn = get_connection()
@@ -175,9 +179,7 @@ def delete_product(product_id):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-    SELECT name FROM inventory WHERE id = ?
-    """, (product_id,))
+    cursor.execute("SELECT name FROM inventory WHERE id = ?", (product_id,))
     row = cursor.fetchone()
 
     if not row:
@@ -186,13 +188,49 @@ def delete_product(product_id):
 
     product_name = row["name"]
 
-    cursor.execute("""
-    DELETE FROM inventory
-    WHERE id = ?
-    """, (product_id,))
+    cursor.execute("DELETE FROM inventory WHERE id = ?", (product_id,))
 
     conn.commit()
     conn.close()
 
     add_log(f"נמחק מוצר: {product_name}")
     return True
+
+
+def export_backup_data():
+    return {
+        "inventory": get_all_inventory(),
+        "logs": get_logs(limit=100)
+    }
+
+
+def import_backup_data(data):
+    if not isinstance(data, dict):
+        raise ValueError("Invalid backup format")
+
+    inventory = data.get("inventory", [])
+    if not isinstance(inventory, list):
+        raise ValueError("Invalid inventory data")
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM inventory")
+
+    for item in inventory:
+        cursor.execute("""
+        INSERT INTO inventory (name, quantity, unit, location, minimum, notes)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            item.get("name", ""),
+            float(item.get("quantity", 0)),
+            item.get("unit", ""),
+            item.get("location", ""),
+            float(item.get("minimum", 0)),
+            item.get("notes", "")
+        ))
+
+    conn.commit()
+    conn.close()
+
+    add_log("בוצע שחזור מגיבוי")

@@ -616,7 +616,18 @@
         </div>
       </div>
     </div>
+<div id="developerBackupBox" class="form-box hidden">
+  <div class="section-title">💾 גיבוי ושחזור</div>
 
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="downloadBackup()">📥 הורד גיבוי</button>
+  </div>
+
+  <div class="form-grid">
+    <input id="backupFileInput" class="input" type="file" accept=".json" />
+    <button class="btn btn-secondary" onclick="uploadBackup()">📤 העלה קובץ גיבוי</button>
+  </div>
+</div>
     <div class="card">
       <div class="section-title">🔎 מלאי נוכחי</div>
 
@@ -652,20 +663,23 @@
     let activeFilter = "all";
 
     function setRole(role) {
-      currentRole = role;
+  currentRole = role;
 
-      const roleBadge = document.getElementById("roleBadge");
-      const addProductBox = document.getElementById("addProductBox");
+  const roleBadge = document.getElementById("roleBadge");
+  const addProductBox = document.getElementById("addProductBox");
+  const developerBackupBox = document.getElementById("developerBackupBox");
 
-      roleBadge.classList.remove("hidden");
-      roleBadge.textContent = role === "developer" ? "🛠️ מצב מפתח" : "👤 כניסה רגילה";
+  roleBadge.classList.remove("hidden");
+  roleBadge.textContent = role === "developer" ? "🛠️ מצב מפתח" : "👤 כניסה רגילה";
 
-      if (role === "developer") {
-        addProductBox.classList.remove("hidden");
-      } else {
-        addProductBox.classList.add("hidden");
-      }
-    }
+  if (role === "developer") {
+    addProductBox.classList.remove("hidden");
+    developerBackupBox.classList.remove("hidden");
+  } else {
+    addProductBox.classList.add("hidden");
+    developerBackupBox.classList.add("hidden");
+  }
+}
 
     function toggleDeveloperLogin() {
       document.getElementById("developerLoginBox").classList.toggle("hidden");
@@ -1050,9 +1064,88 @@
       tg.MainButton.show();
       tg.MainButton.onClick(loadInventory);
     }
+async function downloadBackup() {
+  if (currentRole !== "developer") {
+    tg.showAlert("אין הרשאה לפעולה הזאת");
+    return;
+  }
 
+  const password = document.getElementById("developerPassword").value;
+
+  if (!password) {
+    tg.showAlert("יש להזין סיסמת מפתח");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/backup?password=${encodeURIComponent(password)}`);
+
+    if (!response.ok) {
+      tg.showAlert("שגיאה בהורדת הגיבוי");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "warehouse_backup.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    tg.showAlert("הגיבוי הורד בהצלחה");
+  } catch (error) {
+    tg.showAlert("שגיאה בהורדת הגיבוי");
+  }
+}
+
+async function uploadBackup() {
+  if (currentRole !== "developer") {
+    tg.showAlert("אין הרשאה לפעולה הזאת");
+    return;
+  }
+
+  const password = document.getElementById("developerPassword").value;
+  const fileInput = document.getElementById("backupFileInput");
+  const file = fileInput.files[0];
+
+  if (!password) {
+    tg.showAlert("יש להזין סיסמת מפתח");
+    return;
+  }
+
+  if (!file) {
+    tg.showAlert("יש לבחור קובץ גיבוי");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await fetch(`/api/backup/import?password=${encodeURIComponent(password)}`, {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      tg.showAlert(err.detail || "שגיאה בשחזור הגיבוי");
+      return;
+    }
+
+    tg.showAlert("השחזור הושלם בהצלחה");
+    fileInput.value = "";
+    await loadInventory();
+  } catch (error) {
+    tg.showAlert("שגיאה בשחזור הגיבוי");
+  }
+}
     initTelegramUI();
     loadInventory();
   </script>
 </body>
+</html>
 </html>

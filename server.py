@@ -1,7 +1,8 @@
 import os
+import json
 
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
@@ -14,6 +15,8 @@ from database import (
     add_product,
     use_product,
     delete_product,
+    export_backup_data,
+    import_backup_data,
 )
 
 app = FastAPI()
@@ -109,6 +112,42 @@ async def delete_product_api(product_id: int):
 
     if not success:
         raise HTTPException(status_code=404, detail="המוצר לא נמצא")
+
+    return {"ok": True}
+
+
+@app.get("/api/backup")
+async def download_backup(password: str):
+    if password != DEVELOPER_PASSWORD:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    data = export_backup_data()
+    content = json.dumps(data, ensure_ascii=False, indent=2)
+
+    return Response(
+        content=content,
+        media_type="application/json",
+        headers={
+            "Content-Disposition": 'attachment; filename="warehouse_backup.json"'
+        }
+    )
+
+
+@app.post("/api/backup/import")
+async def upload_backup(password: str, file: UploadFile = File(...)):
+    if password != DEVELOPER_PASSWORD:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    if not file.filename.endswith(".json"):
+        raise HTTPException(status_code=400, detail="יש להעלות קובץ JSON")
+
+    raw = await file.read()
+
+    try:
+        data = json.loads(raw.decode("utf-8"))
+        import_backup_data(data)
+    except Exception:
+        raise HTTPException(status_code=400, detail="קובץ גיבוי לא תקין")
 
     return {"ok": True}
 
