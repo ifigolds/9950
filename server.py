@@ -1,10 +1,14 @@
 import os
 import json
+import tempfile
 
 from fastapi import FastAPI, Request, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from dotenv import load_dotenv
+from aiogram import Bot
+from aiogram.types import FSInputFile
 
 from database import (
     init_db,
@@ -19,10 +23,13 @@ from database import (
     import_backup_data,
 )
 
+load_dotenv()
+
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 DEVELOPER_PASSWORD = os.getenv("DEVELOPER_PASSWORD", "Dfgnmbxo1")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 
 
 class ProductCreate(BaseModel):
@@ -42,6 +49,11 @@ class ProductUse(BaseModel):
 class LoginRequest(BaseModel):
     mode: str
     password: str | None = None
+
+
+class BackupSendRequest(BaseModel):
+    password: str
+    chat_id: int
 
 
 @app.on_event("startup")
@@ -148,6 +160,37 @@ async def upload_backup(password: str, file: UploadFile = File(...)):
         import_backup_data(data)
     except Exception:
         raise HTTPException(status_code=400, detail="קובץ גיבוי לא תקין")
+
+    return {"ok": True}
+
+
+@app.post("/api/backup/send-to-telegram")
+async def send_backup_to_telegram(payload: BackupSendRequest):
+    if payload.password != DEVELOPER_PASSWORD:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    if not BOT_TOKEN:
+        raise HTTPException(status_code=500, detail="BOT_TOKEN חסר בשרת")
+
+    data = export_backup_data()
+    content = json.dumps(data, ensure_ascii=False, indent=2)
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json", mode="w", encoding="utf-8") as temp_file:
+        temp_file.write(content)
+        temp_path = temp_file.name
+
+    try:
+        bot = Bot(token=BOT_TOKEN)
+        document = FSInputFile(temp_path, filename="warehouse_backup.json")
+        await bot.send_document(
+            chat_id=payload.chat_id,
+            document=document,
+            caption="📦 גיבוי מלאי"
+        )
+        await bot.session.close()
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
     return {"ok": True}
 

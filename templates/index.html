@@ -621,6 +621,7 @@
 
   <div class="toolbar">
     <button class="btn btn-primary" onclick="downloadBackup()">📥 הורד גיבוי</button>
+    <button class="btn btn-secondary" onclick="sendBackupToTelegram()">📨 שלח גיבוי לבוט</button>
   </div>
 
   <div class="form-grid">
@@ -1069,7 +1070,48 @@ async function downloadBackup() {
     tg.showAlert("אין הרשאה לפעולה הזאת");
     return;
   }
+async function sendBackupToTelegram() {
+  if (currentRole !== "developer") {
+    tg.showAlert("אין הרשאה לפעולה הזאת");
+    return;
+  }
 
+  const password = document.getElementById("developerPassword").value;
+  const chatId = tg.initDataUnsafe?.user?.id;
+
+  if (!password) {
+    tg.showAlert("יש להזין סיסמת מפתח");
+    return;
+  }
+
+  if (!chatId) {
+    tg.showAlert("לא ניתן לזהות את המשתמש בטלגרם");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/backup/send-to-telegram", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        password: password,
+        chat_id: chatId
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      tg.showAlert(err.detail || "שגיאה בשליחת הגיבוי");
+      return;
+    }
+
+    tg.showAlert("הגיבוי נשלח אליך בבוט");
+  } catch (error) {
+    tg.showAlert("שגיאה בשליחת הגיבוי");
+  }
+}
   const password = document.getElementById("developerPassword").value;
 
   if (!password) {
