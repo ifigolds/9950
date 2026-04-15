@@ -1070,8 +1070,41 @@ async function downloadBackup() {
     tg.showAlert("אין הרשאה לפעולה הזאת");
     return;
   }
+
+  const password = document.getElementById("developerPassword").value;
+
+  if (!password) {
+    tg.showAlert("יש להזין סיסמת מפתח");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/backup?password=${encodeURIComponent(password)}`);
+
+    if (!response.ok) {
+      tg.showAlert("שגיאה בהורדת הגיבוי");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "warehouse_backup.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    tg.showAlert("הגיבוי הורד בהצלחה");
+  } catch (error) {
+    tg.showAlert("שגיאה בהורדת הגיבוי");
+  }
+}
+
 async function sendBackupToTelegram() {
-tg.showAlert("кнопка нажалась");
+  tg.showAlert("кнопка нажалась");
+
   if (currentRole !== "developer") {
     tg.showAlert("אין הרשאה לפעולה הזאת");
     return;
@@ -1111,36 +1144,6 @@ tg.showAlert("кнопка нажалась");
     tg.showAlert("הגיבוי נשלח אליך בבוט");
   } catch (error) {
     tg.showAlert("שגיאה בשליחת הגיבוי");
-  }
-}
-  const password = document.getElementById("developerPassword").value;
-
-  if (!password) {
-    tg.showAlert("יש להזין סיסמת מפתח");
-    return;
-  }
-
-  try {
-    const response = await fetch(`/api/backup?password=${encodeURIComponent(password)}`);
-
-    if (!response.ok) {
-      tg.showAlert("שגיאה בהורדת הגיבוי");
-      return;
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "warehouse_backup.json";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-
-    tg.showAlert("הגיבוי הורד בהצלחה");
-  } catch (error) {
-    tg.showAlert("שגיאה בהורדת הגיבוי");
   }
 }
 
