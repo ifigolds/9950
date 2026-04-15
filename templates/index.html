@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מטבח 9950</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-2: #243247;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --line: rgba(255,255,255,0.08);
+      --primary: #22c55e;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --shadow: 0 12px 30px rgba(0,0,0,0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(34,197,94,0.12), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(56,189,248,0.10), transparent 28%),
+        linear-gradient(180deg, #0b1220 0%, #111827 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .header, .card, .form-box {
+      background: linear-gradient(180deg, rgba(30,41,59,0.95), rgba(15,23,42,0.96));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .input, .search {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #22c55e, #16a34a);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(180deg, #334155, #1e293b);
+      color: white;
+      border: 1px solid var(--line);
+    }
+
+    .btn-danger {
+      background: linear-gradient(180deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .product-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .product-name {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .product-qty {
+      font-size: 15px;
+      font-weight: 700;
+      color: #d1fae5;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.22);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+      border-bottom: 1px dashed rgba(255,255,255,0.06);
+      padding: 6px 0;
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      color: var(--muted);
+    }
+
+    .value {
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .status {
+      margin-top: 12px;
+      display: inline-flex;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .ok {
+      color: #86efac;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.24);
+    }
+
+    .warn {
+      color: #fcd34d;
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.26);
+    }
+
+    .danger {
+      color: #fca5a5;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.26);
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .form-grid, .two-cols {
+      display: grid;
+      gap: 10px;
+    }
+
+    .two-cols {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .small-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .small-use {
+      background: rgba(245,158,11,0.15);
+      color: #fcd34d;
+      border: 1px solid rgba(245,158,11,0.28);
+    }
+
+    .small-delete {
+      background: rgba(239,68,68,0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239,68,68,0.28);
+    }
+
+    .logs-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .log-item {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .log-time {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .welcome-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top, rgba(34,197,94,0.14), transparent 24%),
+        radial-gradient(circle at bottom, rgba(56,189,248,0.10), transparent 30%),
+        rgba(8, 12, 22, 0.96);
+      backdrop-filter: blur(8px);
+    }
+
+    .welcome-box {
+      width: 100%;
+      max-width: 520px;
+      border-radius: 28px;
+      padding: 32px 24px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(30,41,59,0.98), rgba(15,23,42,0.98));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    }
+
+    .welcome-number {
+      font-size: 88px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 4px;
+      margin-bottom: 12px;
+      color: #ffffff;
+      text-shadow:
+        0 0 10px rgba(34,197,94,0.25),
+        0 0 24px rgba(34,197,94,0.18);
+    }
+
+    .welcome-title {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .welcome-text {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .welcome-enter {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 15px 18px;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(180deg, #22c55e, #16a34a);
+      box-shadow: 0 10px 25px rgba(34,197,94,0.22);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 640px) {
+      .stats, .two-cols {
+        grid-template-columns: 1fr;
+      }
+
+      .product-head, .row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .value {
+        text-align: right;
+      }
+
+      .welcome-number {
+        font-size: 68px;
+      }
+
+      .welcome-title {
+        font-size: 24px;
+      }
+    }
+    .developer-box {
+  margin-bottom: 22px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.developer-label {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.developer-name {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.developer-phone {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #86efac;
+}
+  </style>
+</head>
+<body>
+  <div id="welcomeOverlay" class="welcome-overlay">
+    <div class="welcome-box">
+      <div class="welcome-number">9950</div>
+      <div class="welcome-title">ברוך הבא</div>
+      <div class="welcome-text">
+  מערכת ניהול מלאי למטבח.<br>
+  כניסה מהירה, עבודה מסודרת וניהול פשוט מתוך טלגרם.
+</div>
+
+<div class="developer-box">
+  <div class="developer-label">ליצירת קשר עם המפתח</div>
+  <div class="developer-name">איליה גולדפרב</div>
+  <div class="developer-phone">0526042668</div>
+</div>
+
+<button class="welcome-enter" onclick="enterApp()">כניסה למערכת</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1 class="title">מערכת ניהול מלאי</h1>
+      <div class="subtitle" id="welcomeText">טוען נתוני משתמש...</div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">סה״כ מוצרים</div>
+          <div class="stat-value" id="totalProducts">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">פריטים במחסור</div>
+          <div class="stat-value" id="lowStockCount">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">מיקומים פעילים</div>
+          <div class="stat-value" id="locationsCount">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-box">
+      <div class="section-title">הוספת מוצר</div>
+
+      <div class="form-grid">
+        <input id="name" class="input" type="text" placeholder="שם מוצר" />
+        <div class="two-cols">
+          <input id="quantity" class="input" type="number" step="0.1" placeholder="כמות" />
+          <input id="unit" class="input" type="text" placeholder="יחידה" />
+        </div>
+        <div class="two-cols">
+          <input id="location" class="input" type="text" placeholder="מיקום" />
+          <input id="minimum" class="input" type="number" step="0.1" placeholder="מינימום" />
+        </div>
+        <input id="notes" class="input" type="text" placeholder="הערות" />
+
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="addProduct()">שמור מוצר</button>
+          <button class="btn btn-secondary" onclick="showLowStock()">מה חסר</button>
+          <button class="btn btn-secondary" onclick="loadInventory()">הצג הכל</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">מלאי נוכחי</div>
+
+      <div class="toolbar">
+        <input
+          id="searchInput"
+          class="search"
+          type="text"
+          placeholder="חיפוש לפי שם מוצר או מיקום..."
+          oninput="renderProducts()"
+        />
+        <button class="btn btn-primary" onclick="loadInventory()">רענן</button>
+      </div>
+
+      <div id="inventoryList" class="grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">היסטוריית פעולות</div>
+      <div id="logsList" class="logs-list"></div>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    let inventoryData = [];
+
+    function enterApp() {
+      document.getElementById("welcomeOverlay").classList.add("hidden");
+    }
+
+    function getStatus(item) {
+      const quantity = Number(item.quantity);
+      const minimum = Number(item.minimum);
+
+      if (quantity <= 0) return { text: "❌ נגמר", className: "danger" };
+      if (quantity <= minimum) return { text: "⚠️ מחסור", className: "warn" };
+      return { text: "✅ תקין", className: "ok" };
+    }
+
+    function updateHeaderStats(data) {
+      const lowStockItems = data.filter(item => Number(item.quantity) <= Number(item.minimum));
+      const uniqueLocations = new Set(data.map(item => item.location));
+
+      document.getElementById("totalProducts").textContent = data.length;
+      document.getElementById("lowStockCount").textContent = lowStockItems.length;
+      document.getElementById("locationsCount").textContent = uniqueLocations.size;
+    }
+
+    function renderProducts() {
+      const list = document.getElementById("inventoryList");
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+
+      let filtered = [...inventoryData];
+
+      if (query) {
+        filtered = filtered.filter(item =>
+          String(item.name).toLowerCase().includes(query) ||
+          String(item.location).toLowerCase().includes(query)
+        );
+      }
+
+      if (!filtered.length) {
+        list.innerHTML = `<div class="empty-state">לא נמצאו פריטים להצגה</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(item => {
+        const status = getStatus(item);
+
+        return `
+          <div class="card">
+            <div class="product-head">
+              <div class="product-name">${item.name}</div>
+              <div class="product-qty">${item.quantity} ${item.unit}</div>
+            </div>
+
+            <div class="row">
+              <div class="label">מיקום</div>
+              <div class="value">${item.location}</div>
+            </div>
+            <div class="row">
+              <div class="label">מינימום</div>
+              <div class="value">${item.minimum}</div>
+            </div>
+            <div class="row">
+              <div class="label">הערות</div>
+              <div class="value">${item.notes || "-"}</div>
+            </div>
+
+            <div class="status ${status.className}">
+              ${status.text}
+            </div>
+
+            <div class="product-actions">
+              <button class="small-btn small-use" onclick="useProduct(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
+                שימוש
+              </button>
+              <button class="small-btn small-delete" onclick="deleteProduct(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
+                מחק
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadInventory() {
+      const list = document.getElementById("inventoryList");
+      list.innerHTML = `<div class="empty-state">טוען מלאי...</div>`;
+
+      try {
+        const response = await fetch("/api/inventory");
+        const data = await response.json();
+        inventoryData = data;
+        updateHeaderStats(data);
+        renderProducts();
+        await loadLogs();
+      } catch (error) {
+        list.innerHTML = `<div class="empty-state">שגיאה בטעינת הנתונים</div>`;
+      }
+    }
+
+    async function showLowStock() {
+      const list = document.getElementById("inventoryList");
+      list.innerHTML = `<div class="empty-state">טוען נתוני מחסור...</div>`;
+
+      try {
+        const response = await fetch("/api/low-stock");
+        const data = await response.json();
+        inventoryData = data;
+
+        const allResponse = await fetch("/api/inventory");
+        const allData = await allResponse.json();
+        updateHeaderStats(allData);
+
+        renderProducts();
+      } catch (error) {
+        list.innerHTML = `<div class="empty-state">שגיאה בטעינת הנתונים</div>`;
+      }
+    }
+
+    async function loadLogs() {
+      const list = document.getElementById("logsList");
+
+      try {
+        const response = await fetch("/api/logs");
+        const logs = await response.json();
+
+        if (!logs.length) {
+          list.innerHTML = `<div class="empty-state">אין היסטוריית פעולות</div>`;
+          return;
+        }
+
+        list.innerHTML = logs.map(log => `
+          <div class="log-item">
+            <div>${log.action}</div>
+            <div class="log-time">${log.created_at}</div>
+          </div>
+        `).join("");
+      } catch (error) {
+        list.innerHTML = `<div class="empty-state">שגיאה בטעינת ההיסטוריה</div>`;
+      }
+    }
+
+    function clearForm() {
+      document.getElementById("name").value = "";
+      document.getElementById("quantity").value = "";
+      document.getElementById("unit").value = "";
+      document.getElementById("location").value = "";
+      document.getElementById("minimum").value = "";
+      document.getElementById("notes").value = "";
+    }
+
+    async function addProduct() {
+      const name = document.getElementById("name").value.trim();
+      const quantity = Number(document.getElementById("quantity").value);
+      const unit = document.getElementById("unit").value.trim();
+      const location = document.getElementById("location").value.trim();
+      const minimum = Number(document.getElementById("minimum").value || 0);
+      const notes = document.getElementById("notes").value.trim();
+
+      if (!name || !unit || !location || !quantity) {
+        tg.showAlert("נא למלא שם מוצר, כמות, יחידה ומיקום");
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, quantity, unit, location, minimum, notes })
+        });
+
+        if (!response.ok) throw new Error();
+
+        tg.showAlert("המוצר נשמר בהצלחה");
+        clearForm();
+        await loadInventory();
+      } catch (error) {
+        tg.showAlert("שגיאה בשמירת המוצר");
+      }
+    }
+
+    async function useProduct(productId, productName) {
+      const value = prompt(`כמה ירד מהמוצר "${productName}"?`);
+
+      if (value === null) return;
+
+      const quantity = Number(value);
+      if (!quantity || quantity <= 0) {
+        tg.showAlert("נא להזין כמות תקינה");
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/use", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_id: productId,
+            quantity: quantity
+          })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          tg.showAlert(err.detail || "שגיאה בעדכון המלאי");
+          return;
+        }
+
+        tg.showAlert("המלאי עודכן בהצלחה");
+        await loadInventory();
+      } catch (error) {
+        tg.showAlert("שגיאה בעדכון המלאי");
+      }
+    }
+
+    async function deleteProduct(productId, productName) {
+      const confirmed = confirm(`למחוק את המוצר "${productName}"?`);
+      if (!confirmed) return;
+
+      try {
+        const response = await fetch(`/api/products/${productId}`, {
+          method: "DELETE"
+        });
+
+        if (!response.ok) {
+          tg.showAlert("שגיאה במחיקת המוצר");
+          return;
+        }
+
+        tg.showAlert("המוצר נמחק");
+        await loadInventory();
+      } catch (error) {
+        tg.showAlert("שגיאה במחיקת המוצר");
+      }
+    }
+
+    function initTelegramUI() {
+      const user = tg.initDataUnsafe?.user;
+      const welcomeText = document.getElementById("welcomeText");
+
+      if (user?.first_name) {
+        welcomeText.textContent = `שלום ${user.first_name}, ברוך הבא למערכת`;
+      } else {
+        welcomeText.textContent = "ברוך הבא למערכת ניהול המלאי";
+      }
+
+      tg.MainButton.setText("רענן מלאי");
+      tg.MainButton.show();
+      tg.MainButton.onClick(loadInventory);
+    }
+
+    initTelegramUI();
+    loadInventory();
+  </script>
+</body>
+</html>
