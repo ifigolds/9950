@@ -9,7 +9,6 @@
     :root {
       --bg: #0f172a;
       --card: #1e293b;
-      --card-2: #243247;
       --text: #f8fafc;
       --muted: #94a3b8;
       --line: rgba(255,255,255,0.08);
@@ -134,10 +133,7 @@
       color: white;
     }
 
-    .grid {
-      display: grid;
-      gap: 12px;
-    }
+    .grid { display: grid; gap: 12px; }
 
     .product-head {
       display: flex;
@@ -147,10 +143,7 @@
       margin-bottom: 10px;
     }
 
-    .product-name {
-      font-size: 18px;
-      font-weight: 800;
-    }
+    .product-name { font-size: 18px; font-weight: 800; }
 
     .product-qty {
       font-size: 15px;
@@ -171,18 +164,10 @@
       padding: 6px 0;
     }
 
-    .row:last-child {
-      border-bottom: none;
-    }
+    .row:last-child { border-bottom: none; }
 
-    .label {
-      color: var(--muted);
-    }
-
-    .value {
-      font-weight: 600;
-      text-align: left;
-    }
+    .label { color: var(--muted); }
+    .value { font-weight: 600; text-align: left; }
 
     .status {
       margin-top: 12px;
@@ -323,7 +308,39 @@
       color: var(--muted);
       font-size: 15px;
       line-height: 1.6;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
+    }
+
+    .developer-box {
+      margin-bottom: 22px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .developer-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .developer-name {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .developer-phone {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #86efac;
+    }
+
+    .welcome-actions {
+      display: grid;
+      gap: 12px;
     }
 
     .welcome-enter {
@@ -339,8 +356,38 @@
       box-shadow: 0 10px 25px rgba(34,197,94,0.22);
     }
 
+    .welcome-dev {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 15px 18px;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(180deg, #334155, #1e293b);
+    }
+
+    .password-box {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
     .hidden {
       display: none !important;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      background: rgba(56,189,248,0.12);
+      border: 1px solid rgba(56,189,248,0.24);
+      color: #7dd3fc;
     }
 
     @media (max-width: 640px) {
@@ -365,32 +412,6 @@
         font-size: 24px;
       }
     }
-    .developer-box {
-  margin-bottom: 22px;
-  padding: 14px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.developer-label {
-  color: var(--muted);
-  font-size: 13px;
-  margin-bottom: 6px;
-}
-
-.developer-name {
-  font-size: 18px;
-  font-weight: 800;
-  margin-bottom: 4px;
-}
-
-.developer-phone {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: 1px;
-  color: #86efac;
-}
   </style>
 </head>
 <body>
@@ -399,17 +420,25 @@
       <div class="welcome-number">9950</div>
       <div class="welcome-title">ברוך הבא</div>
       <div class="welcome-text">
-  מערכת ניהול מלאי למטבח.<br>
-  כניסה מהירה, עבודה מסודרת וניהול פשוט מתוך טלגרם.
-</div>
+        מערכת ניהול מלאי למטבח.<br>
+        כניסה מהירה, עבודה מסודרת וניהול פשוט מתוך טלגרם.
+      </div>
 
-<div class="developer-box">
-  <div class="developer-label">ליצירת קשר עם המפתח</div>
-  <div class="developer-name">איליה גולדפרב</div>
-  <div class="developer-phone">0526042668</div>
-</div>
+      <div class="developer-box">
+        <div class="developer-label">ליצירת קשר עם המפתח</div>
+        <div class="developer-name">איליה גולדפרב</div>
+        <div class="developer-phone">0526042668</div>
+      </div>
 
-<button class="welcome-enter" onclick="enterApp()">כניסה למערכת</button>
+      <div class="welcome-actions">
+        <button class="welcome-enter" onclick="loginUser()">כניסה רגילה</button>
+        <button class="welcome-dev" onclick="toggleDeveloperLogin()">כניסת מפתח</button>
+      </div>
+
+      <div id="developerLoginBox" class="password-box hidden">
+        <input id="developerPassword" class="input" type="password" placeholder="הכנס סיסמה" />
+        <button class="welcome-enter" onclick="loginDeveloper()">התחבר כמפתח</button>
+      </div>
     </div>
   </div>
 
@@ -417,6 +446,7 @@
     <div class="header">
       <h1 class="title">מערכת ניהול מלאי</h1>
       <div class="subtitle" id="welcomeText">טוען נתוני משתמש...</div>
+      <div id="roleBadge" class="role-badge hidden"></div>
 
       <div class="stats">
         <div class="stat">
@@ -434,7 +464,7 @@
       </div>
     </div>
 
-    <div class="form-box">
+    <div id="addProductBox" class="form-box">
       <div class="section-title">הוספת מוצר</div>
 
       <div class="form-grid">
@@ -486,9 +516,74 @@
     tg.expand();
 
     let inventoryData = [];
+    let currentRole = "user";
 
-    function enterApp() {
-      document.getElementById("welcomeOverlay").classList.add("hidden");
+    function setRole(role) {
+      currentRole = role;
+
+      const roleBadge = document.getElementById("roleBadge");
+      const addProductBox = document.getElementById("addProductBox");
+
+      roleBadge.classList.remove("hidden");
+      roleBadge.textContent = role === "developer" ? "מצב מפתח" : "כניסה רגילה";
+
+      if (role === "developer") {
+        addProductBox.classList.remove("hidden");
+      } else {
+        addProductBox.classList.add("hidden");
+      }
+    }
+
+    function toggleDeveloperLogin() {
+      document.getElementById("developerLoginBox").classList.toggle("hidden");
+    }
+
+    async function loginUser() {
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: "user" })
+        });
+
+        if (!response.ok) {
+          tg.showAlert("שגיאה בכניסה");
+          return;
+        }
+
+        const data = await response.json();
+        setRole(data.role);
+        document.getElementById("welcomeOverlay").classList.add("hidden");
+      } catch (error) {
+        tg.showAlert("שגיאה בכניסה");
+      }
+    }
+
+    async function loginDeveloper() {
+      const password = document.getElementById("developerPassword").value;
+
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "developer",
+            password: password
+          })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          tg.showAlert(err.detail || "שגיאה בכניסה");
+          return;
+        }
+
+        const data = await response.json();
+        setRole(data.role);
+        document.getElementById("welcomeOverlay").classList.add("hidden");
+      } catch (error) {
+        tg.showAlert("שגיאה בכניסת מפתח");
+      }
     }
 
     function getStatus(item) {
@@ -529,6 +624,18 @@
 
       list.innerHTML = filtered.map(item => {
         const status = getStatus(item);
+        const actions = currentRole === "developer"
+          ? `
+            <div class="product-actions">
+              <button class="small-btn small-use" onclick="useProduct(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
+                שימוש
+              </button>
+              <button class="small-btn small-delete" onclick="deleteProduct(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
+                מחק
+              </button>
+            </div>
+          `
+          : "";
 
         return `
           <div class="card">
@@ -554,14 +661,7 @@
               ${status.text}
             </div>
 
-            <div class="product-actions">
-              <button class="small-btn small-use" onclick="useProduct(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
-                שימוש
-              </button>
-              <button class="small-btn small-delete" onclick="deleteProduct(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
-                מחק
-              </button>
-            </div>
+            ${actions}
           </div>
         `;
       }).join("");
@@ -635,6 +735,11 @@
     }
 
     async function addProduct() {
+      if (currentRole !== "developer") {
+        tg.showAlert("אין הרשאה לפעולה הזאת");
+        return;
+      }
+
       const name = document.getElementById("name").value.trim();
       const quantity = Number(document.getElementById("quantity").value);
       const unit = document.getElementById("unit").value.trim();
@@ -665,6 +770,11 @@
     }
 
     async function useProduct(productId, productName) {
+      if (currentRole !== "developer") {
+        tg.showAlert("אין הרשאה לפעולה הזאת");
+        return;
+      }
+
       const value = prompt(`כמה ירד מהמוצר "${productName}"?`);
 
       if (value === null) return;
@@ -699,6 +809,11 @@
     }
 
     async function deleteProduct(productId, productName) {
+      if (currentRole !== "developer") {
+        tg.showAlert("אין הרשאה לפעולה הזאת");
+        return;
+      }
+
       const confirmed = confirm(`למחוק את המוצר "${productName}"?`);
       if (!confirmed) return;
 

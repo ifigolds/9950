@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -17,6 +19,8 @@ from database import (
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+DEVELOPER_PASSWORD = os.getenv("DEVELOPER_PASSWORD", "Dfgnmbxo1")
+
 
 class ProductCreate(BaseModel):
     name: str
@@ -32,6 +36,11 @@ class ProductUse(BaseModel):
     quantity: float
 
 
+class LoginRequest(BaseModel):
+    mode: str
+    password: str | None = None
+
+
 @app.on_event("startup")
 def startup():
     init_db()
@@ -41,6 +50,19 @@ def startup():
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse(request, "index.html")
+
+
+@app.post("/api/login")
+async def login(payload: LoginRequest):
+    if payload.mode == "user":
+        return {"ok": True, "role": "user"}
+
+    if payload.mode == "developer":
+        if payload.password == DEVELOPER_PASSWORD:
+            return {"ok": True, "role": "developer"}
+        raise HTTPException(status_code=401, detail="סיסמה שגויה")
+
+    raise HTTPException(status_code=400, detail="מצב התחברות לא תקין")
 
 
 @app.get("/api/inventory")
