@@ -1071,6 +1071,7 @@ async function downloadBackup() {
     return;
   }
 async function sendBackupToTelegram() {
+tg.showAlert("кнопка нажалась");
   if (currentRole !== "developer") {
     tg.showAlert("אין הרשאה לפעולה הזאת");
     return;
