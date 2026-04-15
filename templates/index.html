@@ -610,10 +610,10 @@
         <input id="notes" class="input" type="text" placeholder="הערות" />
 
         <div class="toolbar">
-          <button class="btn btn-primary" onclick="addProduct()">💾 שמור מוצר</button>
-          <button class="btn btn-secondary" onclick="showLowStock()">⚠️ מה חסר</button>
-          <button class="btn btn-secondary" onclick="loadInventory()">📋 הצג הכל</button>
-        </div>
+  <button class="btn btn-primary" onclick="downloadBackup()">📥 הורד גיבוי</button>
+  <button class="btn btn-secondary" onclick="downloadExcel()">📊 הורד Excel</button>
+  <button class="btn btn-secondary" onclick="sendBackupToTelegram()">📨 שלח גיבוי לבוט</button>
+</div>
       </div>
     </div>
 <div id="developerBackupBox" class="form-box hidden">
@@ -1146,7 +1146,42 @@ async function sendBackupToTelegram() {
     tg.showAlert("שגיאה בשליחת הגיבוי");
   }
 }
+async function downloadExcel() {
+  if (currentRole !== "developer") {
+    tg.showAlert("אין הרשאה לפעולה הזאת");
+    return;
+  }
 
+  const password = document.getElementById("developerPassword").value;
+
+  if (!password) {
+    tg.showAlert("יש להזין סיסמת מפתח");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/export/excel?password=${encodeURIComponent(password)}`);
+
+    if (!response.ok) {
+      tg.showAlert("שגיאה בהורדת קובץ Excel");
+      return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "warehouse_inventory.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    tg.showAlert("קובץ Excel הורד בהצלחה");
+  } catch (error) {
+    tg.showAlert("שגיאה בהורדת קובץ Excel");
+  }
+}
 async function uploadBackup() {
   if (currentRole !== "developer") {
     tg.showAlert("אין הרשאה לפעולה הזאת");

@@ -1,6 +1,9 @@
 import os
 import json
 import tempfile
+from io import BytesIO
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
 
 from fastapi import FastAPI, Request, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, JSONResponse, Response
@@ -144,7 +147,84 @@ async def download_backup(password: str):
         }
     )
 
+@app.get("/api/export/excel")
+async def export_excel(password: str):
+    if password != DEVELOPER_PASSWORD:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
+    inventory = get_all_inventory()
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Inventory"
+
+    headers = ["ID", "שם מוצר", "כמות", "יחידה", "מיקום", "מינימום", "הערות", "סטטוס"]
+    ws.append(headers)
+
+    header_fill = PatternFill(fill_type="solid", fgColor="1E293B")
+    header_font = Font(color="FFFFFF", bold=True)
+
+    for cell in ws[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+
+    for item in inventory:
+        quantity = float(item["quantity"])
+        minimum = float(item["minimum"])
+
+        if quantity <= 0:
+            status = "נגמר"
+        elif quantity <= minimum:
+            status = "מחסור"
+        else:
+            status = "תקין"
+
+        ws.append([
+            item["id"],
+            item["name"],
+            item["quantity"],
+            item["unit"],
+            item["location"],
+            item["minimum"],
+            item["notes"],
+            status,
+        ])
+
+    column_widths = {
+        "A": 8,
+        "B": 24,
+        "C": 12,
+        "D": 14,
+        "E": 18,
+        "F": 12,
+        "G": 24,
+        "H": 14,
+    }
+
+    for col, width in column_widths.items():
+        ws.column_dimensions[col].width = width
+
+    for row in ws.iter_rows(min_row=2):
+        status_cell = row[7]
+        if status_cell.value == "נגמר":
+            status_cell.fill = PatternFill(fill_type="solid", fgColor="FEE2E2")
+        elif status_cell.value == "מחסור":
+            status_cell.fill = PatternFill(fill_type="solid", fgColor="FEF3C7")
+        else:
+            status_cell.fill = PatternFill(fill_type="solid", fgColor="DCFCE7")
+
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    return Response(
+        content=output.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": 'attachment; filename="warehouse_inventory.xlsx"'
+        }
+    )
 @app.post("/api/backup/import")
 async def upload_backup(password: str, file: UploadFile = File(...)):
     if password != DEVELOPER_PASSWORD:
