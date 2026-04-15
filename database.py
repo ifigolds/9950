@@ -52,6 +52,8 @@ def seed_data():
     cursor.execute("SELECT COUNT(*) as count FROM inventory")
     count = cursor.fetchone()["count"]
 
+    seeded = False
+
     if count == 0:
         items = [
             ("חלב", 10, "ליטר", "מקרר 1", 5, ""),
@@ -64,11 +66,13 @@ def seed_data():
         VALUES (?, ?, ?, ?, ?, ?)
         """, items)
 
-        add_log("נוצרו נתוני התחלה")
+        seeded = True
 
     conn.commit()
     conn.close()
 
+    if seeded:
+        add_log("נוצרו נתוני התחלה")
 
 def get_all_inventory():
     conn = get_connection()
