@@ -610,9 +610,9 @@
         <input id="notes" class="input" type="text" placeholder="הערות" />
 
         <div class="toolbar">
-  <button class="btn btn-primary" onclick="downloadBackup()">📥 הורד גיבוי</button>
-  <button class="btn btn-secondary" onclick="downloadExcel()">📊 הורד Excel</button>
-  <button class="btn btn-secondary" onclick="sendBackupToTelegram()">📨 שלח גיבוי לבוט</button>
+  <button class="btn btn-primary" onclick="addProduct()">💾 שמור מוצר</button>
+  <button class="btn btn-secondary" onclick="showLowStock()">⚠️ מה חסר</button>
+  <button class="btn btn-secondary" onclick="loadInventory()">📋 הצג הכל</button>
 </div>
       </div>
     </div>
@@ -620,13 +620,18 @@
   <div class="section-title">💾 גיבוי ושחזור</div>
 
   <div class="toolbar">
-    <button class="btn btn-primary" onclick="downloadBackup()">📥 הורד גיבוי</button>
-    <button class="btn btn-secondary" onclick="sendBackupToTelegram()">📨 שלח גיבוי לבוט</button>
+    <button class="btn btn-primary" onclick="downloadBackup()">📥 הורד גיבוי JSON</button>
+    <button class="btn btn-secondary" onclick="sendBackupToTelegram()">📨 שלח JSON לבוט</button>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn-secondary" onclick="downloadExcel()">📊 הורד Excel</button>
+    <button class="btn btn-secondary" onclick="sendExcelToTelegram()">📬 שלח Excel לבוט</button>
   </div>
 
   <div class="form-grid">
-    <input id="backupFileInput" class="input" type="file" accept=".json" />
-    <button class="btn btn-secondary" onclick="uploadBackup()">📤 העלה קובץ גיבוי</button>
+    <input id="backupFileInput" class="input" type="file" accept=".json,.xlsx" />
+    <button class="btn btn-secondary" onclick="uploadExcelBackup()">📤 העלה Excel</button>
   </div>
 </div>
     <div class="card">
@@ -1051,20 +1056,21 @@
       }
     }
 
-    function initTelegramUI() {
-      const user = tg.initDataUnsafe?.user;
-      const welcomeText = document.getElementById("welcomeText");
+function initTelegramUI() {
+  const user = tg.initDataUnsafe?.user;
+  const welcomeText = document.getElementById("welcomeText");
 
-      if (user?.first_name) {
-        welcomeText.textContent = `שלום ${user.first_name}, ברוך הבא למערכת`;
-      } else {
-        welcomeText.textContent = "ברוך הבא למערכת ניהול המלאי";
-      }
+  if (user?.first_name) {
+    welcomeText.textContent = `שלום ${user.first_name}, ברוך הבא למערכת`;
+  } else {
+    welcomeText.textContent = "ברוך הבא למערכת ניהול המלאי";
+  }
 
-      tg.MainButton.setText("🔄 רענן מלאי");
-      tg.MainButton.show();
-      tg.MainButton.onClick(loadInventory);
-    }
+  tg.MainButton.setText("🔄 רענן מלאי");
+  tg.MainButton.show();
+  tg.MainButton.onClick(loadInventory);
+}
+
 async function downloadBackup() {
   if (currentRole !== "developer") {
     tg.showAlert("אין הרשאה לפעולה הזאת");
@@ -1103,8 +1109,6 @@ async function downloadBackup() {
 }
 
 async function sendBackupToTelegram() {
-  tg.showAlert("кнопка нажалась");
-
   if (currentRole !== "developer") {
     tg.showAlert("אין הרשאה לפעולה הזאת");
     return;
@@ -1146,6 +1150,7 @@ async function sendBackupToTelegram() {
     tg.showAlert("שגיאה בשליחת הגיבוי");
   }
 }
+
 async function downloadExcel() {
   if (currentRole !== "developer") {
     tg.showAlert("אין הרשאה לפעולה הזאת");
@@ -1182,6 +1187,50 @@ async function downloadExcel() {
     tg.showAlert("שגיאה בהורדת קובץ Excel");
   }
 }
+
+async function sendExcelToTelegram() {
+  if (currentRole !== "developer") {
+    tg.showAlert("אין הרשאה לפעולה הזאת");
+    return;
+  }
+
+  const password = document.getElementById("developerPassword").value;
+  const chatId = tg.initDataUnsafe?.user?.id;
+
+  if (!password) {
+    tg.showAlert("יש להזין סיסמת מפתח");
+    return;
+  }
+
+  if (!chatId) {
+    tg.showAlert("לא ניתן לזהות את המשתמש בטלגרם");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/export/excel/send-to-telegram", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        password: password,
+        chat_id: chatId
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      tg.showAlert(err.detail || "שגיאה בשליחת Excel");
+      return;
+    }
+
+    tg.showAlert("קובץ Excel נשלח אליך בבוט");
+  } catch (error) {
+    tg.showAlert("שגיאה בשליחת Excel");
+  }
+}
+
 async function uploadBackup() {
   if (currentRole !== "developer") {
     tg.showAlert("אין הרשאה לפעולה הזאת");
@@ -1224,9 +1273,57 @@ async function uploadBackup() {
     tg.showAlert("שגיאה בשחזור הגיבוי");
   }
 }
-    initTelegramUI();
-    loadInventory();
+
+async function uploadExcelBackup() {
+  if (currentRole !== "developer") {
+    tg.showAlert("אין הרשאה לפעולה הזאת");
+    return;
+  }
+
+  const password = document.getElementById("developerPassword").value;
+  const fileInput = document.getElementById("backupFileInput");
+  const file = fileInput.files[0];
+
+  if (!password) {
+    tg.showAlert("יש להזין סיסמת מפתח");
+    return;
+  }
+
+  if (!file) {
+    tg.showAlert("יש לבחור קובץ");
+    return;
+  }
+
+  if (!file.name.endsWith(".xlsx")) {
+    tg.showAlert("יש לבחור קובץ Excel");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await fetch(`/api/import/excel?password=${encodeURIComponent(password)}`, {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      tg.showAlert(err.detail || "שגיאה בהעלאת Excel");
+      return;
+    }
+
+    tg.showAlert("קובץ Excel נטען בהצלחה");
+    fileInput.value = "";
+    await loadInventory();
+  } catch (error) {
+    tg.showAlert("שגיאה בהעלאת Excel");
+  }
+}
+
+initTelegramUI();
+loadInventory();
   </script>
 </body>
-</html>
 </html>
