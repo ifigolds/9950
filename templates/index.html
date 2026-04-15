@@ -9,12 +9,14 @@
     :root {
       --bg: #0f172a;
       --card: #1e293b;
+      --card-2: #243247;
       --text: #f8fafc;
       --muted: #94a3b8;
       --line: rgba(255,255,255,0.08);
       --primary: #22c55e;
       --danger: #ef4444;
       --warn: #f59e0b;
+      --info: #38bdf8;
       --shadow: 0 12px 30px rgba(0,0,0,0.28);
     }
 
@@ -36,11 +38,11 @@
     }
 
     .container {
-      max-width: 760px;
+      max-width: 860px;
       margin: 0 auto;
     }
 
-    .header, .card, .form-box {
+    .header, .card, .form-box, .welcome-box {
       background: linear-gradient(180deg, rgba(30,41,59,0.95), rgba(15,23,42,0.96));
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
@@ -82,13 +84,13 @@
     }
 
     .stat-value {
-      font-size: 20px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 800;
     }
 
     .section-title {
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 19px;
+      font-weight: 800;
       margin: 0 0 12px 0;
     }
 
@@ -107,6 +109,11 @@
       border-radius: 14px;
       padding: 12px 14px;
       outline: none;
+    }
+
+    .input::placeholder,
+    .search::placeholder {
+      color: #7c8aa0;
     }
 
     .btn {
@@ -133,7 +140,10 @@
       color: white;
     }
 
-    .grid { display: grid; gap: 12px; }
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
 
     .product-head {
       display: flex;
@@ -143,7 +153,10 @@
       margin-bottom: 10px;
     }
 
-    .product-name { font-size: 18px; font-weight: 800; }
+    .product-name {
+      font-size: 18px;
+      font-weight: 800;
+    }
 
     .product-qty {
       font-size: 15px;
@@ -164,10 +177,18 @@
       padding: 6px 0;
     }
 
-    .row:last-child { border-bottom: none; }
+    .row:last-child {
+      border-bottom: none;
+    }
 
-    .label { color: var(--muted); }
-    .value { font-weight: 600; text-align: left; }
+    .label {
+      color: var(--muted);
+    }
+
+    .value {
+      font-weight: 600;
+      text-align: left;
+    }
 
     .status {
       margin-top: 12px;
@@ -281,8 +302,6 @@
       border-radius: 28px;
       padding: 32px 24px;
       text-align: center;
-      background: linear-gradient(180deg, rgba(30,41,59,0.98), rgba(15,23,42,0.98));
-      border: 1px solid rgba(255,255,255,0.08);
       box-shadow: 0 20px 50px rgba(0,0,0,0.45);
     }
 
@@ -390,6 +409,105 @@
       color: #7dd3fc;
     }
 
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .locations-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .location-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .location-card:active {
+      transform: scale(0.98);
+    }
+
+    .location-card.active {
+      border-color: rgba(56,189,248,0.55);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.18) inset;
+    }
+
+    .location-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .location-meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .alert-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .alert-item {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(245,158,11,0.10);
+      border: 1px solid rgba(245,158,11,0.22);
+    }
+
+    .alert-title {
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .alert-sub {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 13px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .chip.active {
+      background: rgba(56,189,248,0.12);
+      border-color: rgba(56,189,248,0.34);
+      color: #7dd3fc;
+    }
+
+    @media (max-width: 780px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .locations-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 640px) {
       .stats, .two-cols {
         grid-template-columns: 1fr;
@@ -425,47 +543,59 @@
       </div>
 
       <div class="developer-box">
-        <div class="developer-label">ליצירת קשר עם המפתח</div>
+        <div class="developer-label">📞 ליצירת קשר עם המפתח</div>
         <div class="developer-name">איליה גולדפרב</div>
         <div class="developer-phone">0526042668</div>
       </div>
 
       <div class="welcome-actions">
-        <button class="welcome-enter" onclick="loginUser()">כניסה רגילה</button>
-        <button class="welcome-dev" onclick="toggleDeveloperLogin()">כניסת מפתח</button>
+        <button class="welcome-enter" onclick="loginUser()">✅ כניסה רגילה</button>
+        <button class="welcome-dev" onclick="toggleDeveloperLogin()">🛠️ כניסת מפתח</button>
       </div>
 
       <div id="developerLoginBox" class="password-box hidden">
         <input id="developerPassword" class="input" type="password" placeholder="הכנס סיסמה" />
-        <button class="welcome-enter" onclick="loginDeveloper()">התחבר כמפתח</button>
+        <button class="welcome-enter" onclick="loginDeveloper()">🔓 התחבר כמפתח</button>
       </div>
     </div>
   </div>
 
   <div class="container">
     <div class="header">
-      <h1 class="title">מערכת ניהול מלאי</h1>
+      <h1 class="title">📦 מערכת ניהול מלאי</h1>
       <div class="subtitle" id="welcomeText">טוען נתוני משתמש...</div>
       <div id="roleBadge" class="role-badge hidden"></div>
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">סה״כ מוצרים</div>
+          <div class="stat-label">📦 סה״כ מוצרים</div>
           <div class="stat-value" id="totalProducts">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">פריטים במחסור</div>
+          <div class="stat-label">⚠️ פריטים במחסור</div>
           <div class="stat-value" id="lowStockCount">0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">מיקומים פעילים</div>
+          <div class="stat-label">📍 מיקומים פעילים</div>
           <div class="stat-value" id="locationsCount">0</div>
         </div>
       </div>
     </div>
 
+    <div id="userDashboard" class="dashboard-grid">
+      <div class="card">
+        <div class="section-title">⚠️ מה חסר עכשיו</div>
+        <div id="lowStockPreview" class="alert-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">🧊 מיקומים</div>
+        <div id="locationsGrid" class="locations-grid"></div>
+      </div>
+    </div>
+
     <div id="addProductBox" class="form-box">
-      <div class="section-title">הוספת מוצר</div>
+      <div class="section-title">➕ הוספת מוצר</div>
 
       <div class="form-grid">
         <input id="name" class="input" type="text" placeholder="שם מוצר" />
@@ -480,32 +610,34 @@
         <input id="notes" class="input" type="text" placeholder="הערות" />
 
         <div class="toolbar">
-          <button class="btn btn-primary" onclick="addProduct()">שמור מוצר</button>
-          <button class="btn btn-secondary" onclick="showLowStock()">מה חסר</button>
-          <button class="btn btn-secondary" onclick="loadInventory()">הצג הכל</button>
+          <button class="btn btn-primary" onclick="addProduct()">💾 שמור מוצר</button>
+          <button class="btn btn-secondary" onclick="showLowStock()">⚠️ מה חסר</button>
+          <button class="btn btn-secondary" onclick="loadInventory()">📋 הצג הכל</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="section-title">מלאי נוכחי</div>
+      <div class="section-title">🔎 מלאי נוכחי</div>
+
+      <div class="filter-row" id="filterRow"></div>
 
       <div class="toolbar">
         <input
           id="searchInput"
           class="search"
           type="text"
-          placeholder="חיפוש לפי שם מוצר או מיקום..."
+          placeholder="🔎 חיפוש לפי שם מוצר או מיקום..."
           oninput="renderProducts()"
         />
-        <button class="btn btn-primary" onclick="loadInventory()">רענן</button>
+        <button class="btn btn-primary" onclick="loadInventory()">🔄 רענן</button>
       </div>
 
       <div id="inventoryList" class="grid"></div>
     </div>
 
     <div class="card">
-      <div class="section-title">היסטוריית פעולות</div>
+      <div class="section-title">🕘 היסטוריית פעולות</div>
       <div id="logsList" class="logs-list"></div>
     </div>
   </div>
@@ -517,6 +649,7 @@
 
     let inventoryData = [];
     let currentRole = "user";
+    let activeFilter = "all";
 
     function setRole(role) {
       currentRole = role;
@@ -525,7 +658,7 @@
       const addProductBox = document.getElementById("addProductBox");
 
       roleBadge.classList.remove("hidden");
-      roleBadge.textContent = role === "developer" ? "מצב מפתח" : "כניסה רגילה";
+      roleBadge.textContent = role === "developer" ? "🛠️ מצב מפתח" : "👤 כניסה רגילה";
 
       if (role === "developer") {
         addProductBox.classList.remove("hidden");
@@ -604,11 +737,89 @@
       document.getElementById("locationsCount").textContent = uniqueLocations.size;
     }
 
+    function renderFilters(data) {
+      const row = document.getElementById("filterRow");
+      const locations = [...new Set(data.map(item => item.location).filter(Boolean))];
+
+      const chips = [
+        { key: "all", label: "📋 הכל" },
+        { key: "low", label: "⚠️ מחסור" },
+        ...locations.map(loc => ({ key: loc, label: `🧊 ${loc}` }))
+      ];
+
+      row.innerHTML = chips.map(chip => `
+        <button class="chip ${activeFilter === chip.key ? 'active' : ''}" onclick="setFilter('${chip.key.replace(/'/g, "\\'")}')">
+          ${chip.label}
+        </button>
+      `).join("");
+    }
+
+    function setFilter(filterKey) {
+      activeFilter = filterKey;
+      renderFilters(inventoryData);
+      renderProducts();
+    }
+
+    function renderLowStockPreview(data) {
+      const container = document.getElementById("lowStockPreview");
+      const low = data.filter(item => Number(item.quantity) <= Number(item.minimum));
+
+      if (!low.length) {
+        container.innerHTML = `<div class="empty-state">✅ כרגע אין מחסור</div>`;
+        return;
+      }
+
+      container.innerHTML = low.slice(0, 6).map(item => `
+        <div class="alert-item">
+          <div class="alert-title">⚠️ ${item.name} — ${item.quantity} ${item.unit}</div>
+          <div class="alert-sub">📍 ${item.location} | מינימום: ${item.minimum}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderLocations(data) {
+      const container = document.getElementById("locationsGrid");
+      const grouped = {};
+
+      data.forEach(item => {
+        if (!grouped[item.location]) grouped[item.location] = [];
+        grouped[item.location].push(item);
+      });
+
+      const locations = Object.keys(grouped);
+
+      if (!locations.length) {
+        container.innerHTML = `<div class="empty-state">אין מיקומים להצגה</div>`;
+        return;
+      }
+
+      container.innerHTML = locations.map(location => {
+        const items = grouped[location];
+        const lowCount = items.filter(item => Number(item.quantity) <= Number(item.minimum)).length;
+
+        return `
+          <div class="location-card ${activeFilter === location ? 'active' : ''}" onclick="setFilter('${location.replace(/'/g, "\\'")}')">
+            <div class="location-title">🧊 ${location}</div>
+            <div class="location-meta">
+              📦 ${items.length} פריטים<br>
+              ${lowCount > 0 ? `⚠️ ${lowCount} במחסור` : '✅ תקין'}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
     function renderProducts() {
       const list = document.getElementById("inventoryList");
       const query = document.getElementById("searchInput").value.trim().toLowerCase();
 
       let filtered = [...inventoryData];
+
+      if (activeFilter === "low") {
+        filtered = filtered.filter(item => Number(item.quantity) <= Number(item.minimum));
+      } else if (activeFilter !== "all") {
+        filtered = filtered.filter(item => item.location === activeFilter);
+      }
 
       if (query) {
         filtered = filtered.filter(item =>
@@ -628,10 +839,10 @@
           ? `
             <div class="product-actions">
               <button class="small-btn small-use" onclick="useProduct(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
-                שימוש
+                ⚙️ שימוש
               </button>
               <button class="small-btn small-delete" onclick="deleteProduct(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
-                מחק
+                🗑️ מחק
               </button>
             </div>
           `
@@ -640,20 +851,20 @@
         return `
           <div class="card">
             <div class="product-head">
-              <div class="product-name">${item.name}</div>
+              <div class="product-name">📦 ${item.name}</div>
               <div class="product-qty">${item.quantity} ${item.unit}</div>
             </div>
 
             <div class="row">
-              <div class="label">מיקום</div>
+              <div class="label">📍 מיקום</div>
               <div class="value">${item.location}</div>
             </div>
             <div class="row">
-              <div class="label">מינימום</div>
+              <div class="label">📉 מינימום</div>
               <div class="value">${item.minimum}</div>
             </div>
             <div class="row">
-              <div class="label">הערות</div>
+              <div class="label">📝 הערות</div>
               <div class="value">${item.notes || "-"}</div>
             </div>
 
@@ -675,7 +886,11 @@
         const response = await fetch("/api/inventory");
         const data = await response.json();
         inventoryData = data;
+
         updateHeaderStats(data);
+        renderFilters(data);
+        renderLowStockPreview(data);
+        renderLocations(data);
         renderProducts();
         await loadLogs();
       } catch (error) {
@@ -684,22 +899,9 @@
     }
 
     async function showLowStock() {
-      const list = document.getElementById("inventoryList");
-      list.innerHTML = `<div class="empty-state">טוען נתוני מחסור...</div>`;
-
-      try {
-        const response = await fetch("/api/low-stock");
-        const data = await response.json();
-        inventoryData = data;
-
-        const allResponse = await fetch("/api/inventory");
-        const allData = await allResponse.json();
-        updateHeaderStats(allData);
-
-        renderProducts();
-      } catch (error) {
-        list.innerHTML = `<div class="empty-state">שגיאה בטעינת הנתונים</div>`;
-      }
+      activeFilter = "low";
+      renderFilters(inventoryData);
+      renderProducts();
     }
 
     async function loadLogs() {
@@ -716,7 +918,7 @@
 
         list.innerHTML = logs.map(log => `
           <div class="log-item">
-            <div>${log.action}</div>
+            <div>🕘 ${log.action}</div>
             <div class="log-time">${log.created_at}</div>
           </div>
         `).join("");
@@ -844,7 +1046,7 @@
         welcomeText.textContent = "ברוך הבא למערכת ניהול המלאי";
       }
 
-      tg.MainButton.setText("רענן מלאי");
+      tg.MainButton.setText("🔄 רענן מלאי");
       tg.MainButton.show();
       tg.MainButton.onClick(loadInventory);
     }
