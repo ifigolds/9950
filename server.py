@@ -1,6 +1,7 @@
 import os
 import json
 import tempfile
+from fastapi.staticfiles import StaticFiles
 from io import BytesIO
 
 from openpyxl import Workbook, load_workbook
@@ -31,6 +32,7 @@ from database import (
 load_dotenv()
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 DEVELOPER_PASSWORD = os.getenv("DEVELOPER_PASSWORD", "Dfgnmbxo1")
